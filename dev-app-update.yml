@@ -1,0 +1,3 @@
+provider: generic
+url: https://tai.phanmemmkt.vn/mkt-maps
+updaterCacheDirName: mkt-maps-updater

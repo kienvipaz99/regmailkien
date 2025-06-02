@@ -1,0 +1,56 @@
+appId: com.mkt-maps.app
+productName: MKT Maps
+directories:
+  buildResources: build
+files:
+  - '!**/.husky/*'
+  - '!**/.vscode/*'
+  - '!src/*'
+  - '!electron.vite.config.{js,ts,mjs,cjs}'
+  - '!{.eslintignore,.prettierignore,*.yaml,*.yml,*.md,*.js,*.cjs}'
+  - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
+  - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+  - '!**/libs/**/*'
+extraFiles:
+  - from: 'dev-app-update.yml'
+    to: 'resources/app-update.yml'
+  - from: 'libs/com.mkt-maps.app.address.db'
+    to: 'resources/com.mkt-maps.app.address.db'
+asarUnpack:
+  - resources/**
+asar: false
+win:
+  executableName: MKT Maps
+nsis:
+  artifactName: ${name}-${version}-setup.${ext}
+  shortcutName: ${productName}
+  uninstallDisplayName: ${productName}
+  createDesktopShortcut: always
+mac:
+  category: public.app-category.productivity
+  entitlementsInherit: build/entitlements.mac.plist
+  hardenedRuntime: true
+  gatekeeperAssess: false
+  extendInfo:
+    - NSCameraUsageDescription: Application requests access to the device's camera.
+    - NSMicrophoneUsageDescription: Application requests access to the device's microphone.
+    - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
+    - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
+  notarize: false
+dmg:
+  artifactName: ${name}-${version}.${ext}
+linux:
+  target:
+    - AppImage
+    - snap
+    - deb
+  maintainer: ${author}
+  category: Utility
+appImage:
+  artifactName: ${name}-${version}.${ext}
+npmRebuild: true
+publish:
+  provider: generic
+  url: https://tai.phanmemmkt.vn/mkt-maps
+electronDownload:
+  mirror: https://npmmirror.com/mirrors/electron/
