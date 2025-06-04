@@ -1,7 +1,7 @@
 import { logger } from '@main/core/nodejs'
 import { CommanAdb } from './commandadb'
 
-export const swipe = async (
+export const swipePhone = async (
   deviceId: string,
   x1: number,
   y1: number,

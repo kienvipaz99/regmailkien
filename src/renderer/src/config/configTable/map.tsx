@@ -1,16 +1,16 @@
 import { AccountGmail } from '@preload/types'
+import { Tooltips } from '@renderer/components'
 import { configContextMenuType } from '@renderer/components/ContextMenu/RenderContextMenu'
-import ToolTips from '@renderer/components/Default/Tooltips'
 import { TColumnsTable } from '@renderer/types'
 import { t } from 'i18next'
 import { isEmpty } from 'lodash'
+import moment from 'moment'
 import { FaTrash } from 'react-icons/fa'
 import { toast } from 'react-toastify'
-
 export const configTableScanMap = (): TColumnsTable<AccountGmail> => [
   {
-    key: 'email',
-    name: 'tables.email',
+    key: 'gmail',
+    name: 'tables.gmail',
     sortable: true,
     resizable: true,
     width: 250
@@ -18,20 +18,22 @@ export const configTableScanMap = (): TColumnsTable<AccountGmail> => [
   {
     key: 'password',
     name: 'tables.password',
-    width: 300,
     sortable: true,
     resizable: true,
-    renderCell: ({ row: { password } }) => (
-      <ToolTips content={password}>
-        <span>{password}</span>
-      </ToolTips>
-    )
+    width: 250
   },
 
   {
     key: 'created_at',
     name: 'tables.created_at',
-    sortable: true,
+    renderCell: ({ row: { createdAt } }) => (
+      <Tooltips
+        content={moment(createdAt).format('DD/MM/YYYY - HH:mm:ss')}
+        classWapper="overflow-hidden truncate"
+      >
+        <span>{moment(createdAt).format('DD/MM/YYYY - HH:mm:ss') ?? '-'}</span>
+      </Tooltips>
+    ),
     resizable: true
   }
   // {

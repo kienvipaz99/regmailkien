@@ -157,8 +157,13 @@ const useCustomFormik = <T extends FormikValues>({
       toast.success(`Xuất dữ liệu thành công!`)
     })
 
+    registerEventListeners('read_data_account_gmail', () => {
+      queriesToInvalidate([queryKeys.accountGmail.readAll])
+    })
+
     return removeEventListeners([
       'wait_close_all_chrome',
+      'read_data_account_gmail',
       'wait_stop_all_job',
       'job_action_finally',
       'log_update',

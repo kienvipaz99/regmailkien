@@ -22,6 +22,7 @@ export const queryKeys = {
     'readSettingProxy',
     'readSettingHistory'
   ] as const),
+  accountGmail: actionKeys('accountGmail', ['readAll', 'create', 'delete'] as const),
   script: actionKeys('script', ['readAll'] as const),
   action: actionKeys('action', [
     'readHistoryBy',

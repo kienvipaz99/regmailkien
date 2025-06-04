@@ -17,14 +17,12 @@ const ScanMapKey = (): JSX.Element => {
   const { data: settingHistory } = useReadSettingHistory()
   const [configSearch, setConfigSearch] = useState<IObjectParams>({
     page: 1,
-    pageSize: 1000,
-    job_id: settingHistory?.create_gmail.jobId
+    pageSize: 1000
   })
   const [selectedRecords, setSelectedRecords] = useState((): ReadonlySet<string> => new Set())
   const { mutate: removePostByField } = useRemovePostByField()
   // const { mutate: exportGMap } = useExportGMap()
   const { data: accountGmail, isFetching } = useReadAllAccount(configSearch)
-
   const [isShowModalFilter, setIsShowModalFilter] = useState(false)
   const { mutate: startAction } = useStartAction()
 
@@ -40,7 +38,7 @@ const ScanMapKey = (): JSX.Element => {
   useEffect(() => {
     setConfigSearch({ ...configSearch, job_id: settingHistory?.create_gmail.jobId })
   }, [settingHistory])
-
+  console.log('accountGmail', accountGmail?.data)
   return (
     <>
       <LayoutWapper layout="6|4">

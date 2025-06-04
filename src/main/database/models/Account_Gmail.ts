@@ -6,7 +6,7 @@ import { accountGmailQB } from '../AppDataSource'
 import { AccountGmail } from '../entities'
 
 export const AccountGmailModel = {
-  upsert: async (payload: AccountGmail[]): Promise<IMainResponse<boolean>> => {
+  upsert: async (payload: Partial<AccountGmail>[]): Promise<IMainResponse<boolean>> => {
     try {
       await Promise.all(
         map(
@@ -34,9 +34,7 @@ export const AccountGmailModel = {
 
   readAll: async (): Promise<IMainResponse<AccountGmail[]>> => {
     try {
-      const data = await accountGmailQB()
-        .select(['account_gmail.id', 'account_gmail.gmail'])
-        .getMany()
+      const data = await accountGmailQB().select().getMany()
 
       return createResponse('read_all_gmail_success', 'success', { data })
     } catch (error) {

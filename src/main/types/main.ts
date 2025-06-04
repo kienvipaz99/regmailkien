@@ -137,6 +137,7 @@ export type IKeyMessageWorker =
   // Maps
   | 'read_data_g_map'
   | 'export_excel_success'
+  | 'read_data_account_gmail'
 
 export interface IResultMessageWorker<T> {
   key: IKeyMessageWorker

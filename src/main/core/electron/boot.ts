@@ -1,5 +1,5 @@
-import { dialogAuthError, initializeWorker, sendMessageRenderer } from '@main/core/electron'
-import { AuthModel, logger, MASP, PASSWORD_MKT, USERNAME_MKT, VERSION_APP } from '@main/core/nodejs'
+import { initializeWorker, sendMessageRenderer } from '@main/core/electron'
+import { AuthModel, logger, MASP, PASSWORD_MKT, USERNAME_MKT } from '@main/core/nodejs'
 import { settings, updateActionSetting, updateSettingBy } from '@main/helper'
 import { getPublicIP } from '@main/nodejs/helper'
 import { ICheckBrowserData, ISettingProxy, ISettingSystem, ITaskTypes, IUser } from '@preload/types'
@@ -11,8 +11,6 @@ import {
   getResolution,
   isAppRunning,
   ISDEV,
-  isFakeHost,
-  MktClient,
   openMktClient,
   ProductOfFb,
   SocketEventKey,
@@ -80,7 +78,7 @@ export const preAppCheck = async (): Promise<void> => {
   updateSettingBy<ISettingSystem>('setting_system', { chrome_path, chrome_version })
   checkValidChrome(chrome_path, chrome_version)
 
-  autoCheckAuth()
+  // autoCheckAuth()
 }
 
 export const reloadSetting = (): void => {
@@ -143,26 +141,26 @@ const autoLogin = async (): Promise<void> => {
   app.exit()
 }
 
-const autoCheckAuth = (): void => {
-  setInterval(() => {
-    let isFakeAuth = false
+// const autoCheckAuth = (): void => {
+//   setInterval(() => {
+//     let isFakeAuth = false
 
-    MktClient.get()
-      .auth.verifyVersion({ version: VERSION_APP })
-      .then(({ success }) => {
-        isFakeAuth = !success
-      })
-      .catch((error) => {
-        logger.error(`${error.response}`)
-        if (400 <= error.response?.status && error.response?.status <= 499) {
-          // 400 || 401 || 403 || 404
-          isFakeAuth = true
-        }
-      })
-      .finally(() => {
-        if (isFakeHost() || isFakeAuth) {
-          dialogAuthError()
-        }
-      })
-  }, 600000)
-}
+//     MktClient.get()
+//       .auth.verifyVersion({ version: VERSION_APP })
+//       .then(({ success }) => {
+//         isFakeAuth = !success
+//       })
+//       .catch((error) => {
+//         logger.error(`${error.response}`)
+//         if (400 <= error.response?.status && error.response?.status <= 499) {
+//           // 400 || 401 || 403 || 404
+//           isFakeAuth = true
+//         }
+//       })
+//       .finally(() => {
+//         if (isFakeHost() || isFakeAuth) {
+//           dialogAuthError()
+//         }
+//       })
+//   }, 600000)
+// }
