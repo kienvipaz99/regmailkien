@@ -32,7 +32,7 @@ export async function randomAction(deviceId: string): Promise<void> {
 }
 const tapPointsGender = [
   { x: 540, y: 1100 },
-  { x: 540, y: 1200 }
+  { x: 540, y: 1150 }
 ]
 export async function clickGender(deviceId: string): Promise<void> {
   const point = randomElement(tapPointsGender)
@@ -66,17 +66,29 @@ function shuffle(str: string): string {
     .sort(() => 0.5 - Math.random())
     .join('')
 }
-export function generateRandomEmail(): string {
-  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789'
-  let username = ''
-  const length = Math.floor(Math.random() * 6) + 8 // độ dài từ 8–13 ký tự
-
-  for (let i = 0; i < length; i++) {
-    username += chars.charAt(Math.floor(Math.random() * chars.length))
-  }
-
-  return `${username}`
+function removeVietnameseTones(str: string): string {
+  return str
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'D')
 }
+
+export function generateRandomEmail(firstName: string, lastName: string): string {
+  const specialChars = '0123456789'
+  const randomSuffixLength = Math.floor(Math.random() * 2) + 5 // tạo 5–6 ký tự ngẫu nhiên
+  let randomSuffix = ''
+
+  for (let i = 0; i < randomSuffixLength; i++) {
+    randomSuffix += specialChars.charAt(Math.floor(Math.random() * specialChars.length))
+  }
+  const cleanFirst = removeVietnameseTones(firstName).toLowerCase().replace(/\s+/g, '')
+  const cleanLast = removeVietnameseTones(lastName).toLowerCase().replace(/\s+/g, '')
+  const username = `${cleanFirst}${cleanLast}${randomSuffix}`
+
+  return username
+}
+
 export function randomVietnameseName(nameaccount: string): string {
   const nameList = nameaccount
     .split('\n')

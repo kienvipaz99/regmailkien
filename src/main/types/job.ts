@@ -5,12 +5,11 @@ import type {
   ISettingProxy,
   ISettingSystem,
   ITypeModuleLogUpdate,
-  ITypePositionScan,
   IUser
 } from '@preload/types'
-import type { MktBrowser } from '@vitechgroup/mkt-browser'
 import type { IPayloadLogUpdate, JobDetail } from '@vitechgroup/mkt-job-queue'
 import { MessagePort } from 'node:worker_threads'
+import { Browser } from 'puppeteer-core'
 import { ITaskName, ITaskTypes } from './task-action'
 
 export type ITypeLogUpdate = (options: IPayloadLogUpdate<ITypeModuleLogUpdate>) => Promise<boolean>
@@ -22,7 +21,8 @@ export interface ICustomData<K extends ITaskName> {
   jobData: IJobData<K>
   account: Account
   parentPort: MessagePort
-  mktBrowser?: MktBrowser
+  browser?: Browser
+  uuid?: string
   logUpdate: ITypeLogUpdate
   serinamephone?: string
 }
@@ -47,7 +47,6 @@ export interface ICustomUniqueData {
 }
 
 export interface IBaseUniqueData {
-  itemPosition: ITypePositionScan
   list_keyword_scan: string[]
   countPositionRemain: number
 }

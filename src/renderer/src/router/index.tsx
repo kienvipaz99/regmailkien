@@ -1,6 +1,6 @@
 import type { IUser } from '@preload/types'
 import { AuthApi } from '@renderer/apis'
-import { DefaultLayout, LayoutAuth, LayoutProviderContext } from '@renderer/components'
+import { DefaultLayout, LayoutAuth } from '@renderer/components'
 import LayoutAuthProvider from '@renderer/context/LayoutAuthProvider'
 import { createHashRouter } from 'react-router-dom'
 import { CustomRouteConfig, layoutType, routes } from './routes'
@@ -24,11 +24,7 @@ const finalRoutes = routes.map((route) => {
       await AuthApi.getUser()
         .then((result) => result.payload?.data ?? null)
         .catch(() => null),
-    element: (
-      <LayoutProviderContext>
-        <LayoutAuthProvider>{checkLayout(route)}</LayoutAuthProvider>
-      </LayoutProviderContext>
-    )
+    element: <LayoutAuthProvider>{checkLayout(route)}</LayoutAuthProvider>
   }
 })
 

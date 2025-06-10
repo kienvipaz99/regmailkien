@@ -233,14 +233,14 @@ export const AccountModel = {
     }
   },
 
-  getOne: (uid: string): Account | undefined => AccountModel.checkAccountValid(uid),
+  getOne: (uid: string): Account => AccountModel.checkAccountValid(uid),
 
   getOneByCategory: async (category: Category): Promise<Account | null> =>
     await accountQB().where('categoryId = :categoryId', { categoryId: category.id }).getOne(),
 
   readAllByFieldIsNotNull: async (key: keyof Account): Promise<Account[]> =>
     await accountQB().where(`${key} is not null`).getMany(),
-  checkAccountValid: (uidAccount: string): Account | undefined => {
+  checkAccountValid: (uidAccount: string): Account => {
     return {
       createdAt: '2025-02-18T06:58:15.000Z',
       updatedAt: '2025-02-18T06:58:15.000Z',

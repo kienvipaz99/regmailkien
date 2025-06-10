@@ -1,5 +1,5 @@
 import { registerEventListeners, removeEventListeners, type IUser } from '@preload/types'
-import { useLayoutBannerRules } from '@renderer/context/LayoutBannerRules'
+// import { useLayoutBannerRules } from '@renderer/context/LayoutBannerRules'
 import { queriesToInvalidate, queryKeys } from '@renderer/services'
 import { IAuthContext } from '@renderer/types'
 import { createContext, FC, PropsWithChildren, useContext, useEffect, useMemo } from 'react'
@@ -9,10 +9,10 @@ const AuthContext = createContext<IAuthContext>({})
 
 const LayoutAuthProvider: FC<PropsWithChildren> = ({ children }) => {
   const user = useLoaderData() as IUser
-  const { handleCheckShowBannerOrRules } = useLayoutBannerRules()
+  // const { handleCheckShowBannerOrRules } = useLayoutBannerRules()
 
   useEffect(() => {
-    handleCheckShowBannerOrRules && handleCheckShowBannerOrRules()
+    // handleCheckShowBannerOrRules && handleCheckShowBannerOrRules()
 
     if (user) {
       // const pathName = window.location.pathname

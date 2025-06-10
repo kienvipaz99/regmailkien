@@ -8,7 +8,7 @@ export const swipePhone = async (
   x2: number,
   y2: number
 ): Promise<boolean> => {
-  const command = `shell input swipe ${x1} ${y1} ${x2} ${y2} 1000`
+  const command = `shell input swipe ${x1} ${y1} ${x2} ${y2} 500`
   try {
     await CommanAdb(deviceId, command)
     logger.info(`✅ Vuốt trên thiết bị ${deviceId} từ (${x1},${y1}) đến (${x2},${y2})`)

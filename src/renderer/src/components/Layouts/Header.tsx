@@ -1,6 +1,6 @@
 import { Menu } from '@mantine/core'
 import { registerEventListeners, removeEventListeners, type IUser } from '@preload/types'
-import { useLayoutBannerRules, useLayoutChangeTitle } from '@renderer/context'
+import { useLayoutChangeTitle } from '@renderer/context'
 import { cn } from '@renderer/helper'
 import useCustomFormik from '@renderer/hook/useCustomFormik'
 import {
@@ -25,7 +25,7 @@ import ButtonActionSetting from '../Setting/ButtonActionSetting'
 import ButtonHeaderWapper from './ButtonHeaderWapper'
 
 const Header = (): JSX.Element => {
-  const { handleShowTerm } = useLayoutBannerRules()
+  // const { handleShowTerm } = useLayoutBannerRules()
   const { handleTour, isDisableTour } = useLayoutChangeTitle()
   const user = useLoaderData() as IUser
   const { t } = useTranslation()
@@ -155,7 +155,7 @@ const Header = (): JSX.Element => {
                       img={typeof user?.avatar === 'string' ? user.avatar : undefined}
                     />
                   </Menu.Label>
-                  <Menu.Item onClick={handleShowTerm}>{t('clause')}</Menu.Item>
+                  {/* <Menu.Item onClick={handleShowTerm}>{t('clause')}</Menu.Item> */}
                   {/* <Menu.Item onClick={() => logout()} color="red">
                     {t('sign_out')}
                   </Menu.Item> */}

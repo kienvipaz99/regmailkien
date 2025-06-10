@@ -91,6 +91,7 @@ export type ISettingSystem = {
   profile_backup_path: string
   show_avatar: boolean
   config_ai: IConfigAi
+  screen_desktop: string
 }
 
 export type ISettingProxy = {

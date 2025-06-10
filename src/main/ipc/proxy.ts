@@ -8,6 +8,7 @@ import {
   IPayloadProxyAssigned,
   ProviderNameType,
   Proxy,
+  ProxyProtocol,
   ProxyStatus
 } from '@vitechgroup/mkt-proxy-client'
 import { chunk, map, random, shuffle } from 'lodash'
@@ -188,7 +189,8 @@ export const IpcMainProxy = (): void => {
           username: proxy.username ?? '',
           password: proxy.password ?? '',
           ip: proxy.ipV6 ?? '',
-          key: proxy.key ?? ''
+          key: proxy.key ?? '',
+          protocol: ProxyProtocol.HTTP
         }
       })
       .filter((item) => item !== undefined)

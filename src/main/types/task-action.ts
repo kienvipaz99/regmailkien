@@ -34,7 +34,37 @@ export interface IBaseConfig {
   errors_counter_allowed: number
   retry: IReTry
 }
-
+export interface IConfigChorme {
+  resolution: string
+  proxy?: string
+  name: string
+}
+export type IViewPortPosition = { x: number; y: number }
+export interface IResponseCreateProfileChorme {
+  type: string
+  title: string
+  content: {
+    uuid: string
+    name: string
+    version: string
+  }
+}
+export interface IResponseOpenChormeHidemium {
+  status: string
+  data: {
+    status: boolean
+    remote_port: number
+    profile_path: string
+    execute_path: string
+    profile_name: string
+    uuid: string
+    web_socket: string
+  }
+}
+export interface IResponseCloseChormeHidemium {
+  uuid: string
+  status: boolean
+}
 export type ITaskName = keyof ITaskTypes
 
 export interface ITaskAction {

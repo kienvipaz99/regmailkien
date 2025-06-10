@@ -23,6 +23,7 @@ import {
 } from '@main/nodejs/actionphone/random-action'
 import { ICustomData, ITaskName } from '@main/types'
 import { delay } from '@vitechgroup/mkt-key-client'
+import { MktPhoneFarm } from '@vitechgroup/mkt-phone-farm'
 import { random } from 'lodash'
 import { closeApp, isOpenedApp, openApp } from '../../../actionphone/open-app'
 
@@ -35,10 +36,15 @@ export const RegGmailPhone = async (data: ICustomData<ITaskName>): Promise<boole
     const firstName = randomVietnameseName(first_name_path)
     const lastName = randomVietnameseName(last_name_path)
     const password = use_random_password ? generateRandomPassword() : default_password
-    const email = generateRandomEmail()
+    const email = generateRandomEmail(firstName, lastName)
     if (!serinamephone) {
       return false
     }
+    await MktPhoneFarm.start({
+      timeCheckDevice: 20000000,
+      wifiSSID: 'ViTechGroup Dev',
+      wifiPassword: 'vitechgroup2023'
+    })
     await activeADBKeyboard(serinamephone)
     await openApp(serinamephone)
 
@@ -53,7 +59,6 @@ export const RegGmailPhone = async (data: ICustomData<ITaskName>): Promise<boole
           console.log('đẫ tìm thấy')
 
           await clickDetectNodeByXPath(serinamephone, '//node[@text="Thêm tài khoản khác"]', 3)
-          await delay(2000)
           break
         } else {
           await swipePhone(serinamephone, 120, 500, 120, 50)
@@ -62,7 +67,7 @@ export const RegGmailPhone = async (data: ICustomData<ITaskName>): Promise<boole
       await clickDetectNodeByXPath(serinamephone, '//node[@text="Google"]', 3)
       await clickDetectNodeByXPath(serinamephone, '//node[@text="Tạo tài khoản"]', 6)
       await clickByPoint(serinamephone, new Point(540, 1110))
-      if (await detectNodeByXPath(serinamephone, '//node[@text="Nhập tên của bạn"]', 3)) {
+      if (await detectNodeByXPath(serinamephone, '//node[@text="Nhập tên của bạn"]', 20)) {
         await clickByPoint(serinamephone, new Point(540, 731))
         // nhập họ
         console.log('data', lastName)
@@ -141,6 +146,12 @@ export const RegGmailPhone = async (data: ICustomData<ITaskName>): Promise<boole
             await enableInterNet(serinamephone)
             await delay(random(interval.from, interval.to))
             await unactiveADBKeyboard(serinamephone)
+
+            // const pathDevice = 'F:\\Nodejs\\reg-mail\\libs\\data\\_device\\daomai_0'
+            // const deviceLauch = await MktPhoneFarm.getDevice(serinamephone)
+            // await deviceLauch?.changeDevice.change(pathDevice)
+
+            // console.log('change device success', A)
           }
         }
       }

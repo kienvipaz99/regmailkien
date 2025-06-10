@@ -37,7 +37,8 @@ export const defaultSettingSystem: ISettingSystem = {
   show_avatar: false,
   config_ai: configAi,
   is_login_facebook_with_email: false,
-  profile_backup_path: ''
+  profile_backup_path: '',
+  screen_desktop: ''
 }
 
 export const defaultSettingProxy: ISettingProxy = {

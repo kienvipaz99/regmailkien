@@ -1,57 +1,30 @@
-import { keyBanner, keyRules, setLocalStore } from '@renderer/helper'
-import { FC, ReactNode, createContext, useCallback, useContext, useMemo, useState } from 'react'
+// import { ReactNode, createContext, useContext } from 'react'
 
-const BannerRulesContext = createContext({})
+// const BannerRulesContext = createContext({})
 
-interface LayoutBannerRulesProps {
-  children?: ReactNode
-}
+// interface LayoutBannerRulesProps {
+//   children?: ReactNode
+// }
 
-interface IValuesBannerRuler {
-  handleShowTerm?: () => void
-  handleCheckShowBannerOrRules?: () => void
-}
+// interface IValuesBannerRuler {
+//   handleShowTerm?: () => void
+//   handleCheckShowBannerOrRules?: () => void
+// }
 
-const LayoutBannerRules: FC<LayoutBannerRulesProps> = ({ children }) => {
-  const [isShow, setIsShow] = useState(false)
-  const [isRules, setIsRules] = useState(false)
+// // const LayoutBannerRules: FC<LayoutBannerRulesProps> = ({ children }) => {
+// //   return (
+// //     // <BannerRulesContext.Provider>
+// //     //   {/* {isShow && (
+// //     //     <Banner isShow={isShow} setIsShow={setIsShow} onClick={(): void => handleShowBanner('0')} />
+// //     //   )} */}
 
-  const handleShowBanner = useCallback((value: string): void => {
-    setIsShow(value === '1')
-    sessionStorage.setItem(keyBanner, value)
-  }, [])
+// //     //   {/* {isRules && <ModalTerm isShow={isRules} setIsShow={setIsRules} />} */}
 
-  const handleShowTerm = useCallback((): void => {
-    setIsRules(true)
-    setLocalStore(keyRules, '1')
-  }, [])
+// //     //   {children}
+// //     // </BannerRulesContext.Provider>
+// //   )
+// // }
 
-  const handleCheckShowBannerOrRules = (): void => {
-    const valueRules = localStorage.getItem(keyRules)
-    if (['0', null].includes(valueRules)) {
-      handleShowTerm()
-      handleShowBanner('1')
-    }
-    return
-  }
+// export const useLayoutBannerRules = (): IValuesBannerRuler => useContext(BannerRulesContext)
 
-  const values: IValuesBannerRuler = useMemo(() => {
-    return { handleShowTerm, handleCheckShowBannerOrRules }
-  }, [handleShowTerm, handleCheckShowBannerOrRules])
-
-  return (
-    <BannerRulesContext.Provider value={values}>
-      {/* {isShow && (
-        <Banner isShow={isShow} setIsShow={setIsShow} onClick={(): void => handleShowBanner('0')} />
-      )} */}
-
-      {/* {isRules && <ModalTerm isShow={isRules} setIsShow={setIsRules} />} */}
-
-      {children}
-    </BannerRulesContext.Provider>
-  )
-}
-
-export const useLayoutBannerRules = (): IValuesBannerRuler => useContext(BannerRulesContext)
-
-export default LayoutBannerRules
+// export default LayoutBannerRules
