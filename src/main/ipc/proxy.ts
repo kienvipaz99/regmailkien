@@ -5,11 +5,10 @@ import { connectMktProxyDb } from '@main/helper/utils'
 import { unZipProxySync } from '@main/nodejs/helper'
 import {
   checkLiveOrDieProxy,
-  IPayloadProxyAssigned,
-  ProviderNameType,
-  Proxy,
-  ProxyProtocol,
-  ProxyStatus
+  EnumProxyProvider,
+  EnumProxyStatus,
+  IPayloadCheckProxy,
+  Proxy
 } from '@vitechgroup/mkt-proxy-client'
 import { chunk, map, random, shuffle } from 'lodash'
 import { In } from 'typeorm'
@@ -25,11 +24,11 @@ export const IpcMainProxy = (): void => {
       case 'v4_rotate': {
         proxies = [
           {
-            provider: payload.provider as ProviderNameType,
+            provider: payload.provider as EnumProxyProvider,
             key: payload?.list_key,
             apiKey: payload?.apiKey,
             proxyType: payload.proxyType,
-            status: ProxyStatus.LIVE
+            status: EnumProxyStatus.LIVE
           } as unknown as Proxy
         ]
 
@@ -170,55 +169,59 @@ export const IpcMainProxy = (): void => {
   })
 
   ipcMainHandle('proxy_checkLiveOrDieProxy', async (_, payload) => {
-    const mktProxyDb = await connectMktProxyDb()
+    try {
+      const mktProxyDb = await connectMktProxyDb()
 
-    const proxies = await mktProxyDb.proxyRepo.find({
-      where: { id: In(payload) }
-    })
-
-    const dataCheck = proxies
-      .map((proxy): IPayloadProxyAssigned | undefined => {
-        if (!proxy.host || !proxy.port) {
-          return
-        }
-
-        return {
-          id: proxy.id,
-          host: proxy.host,
-          port: proxy.port,
-          username: proxy.username ?? '',
-          password: proxy.password ?? '',
-          ip: proxy.ipV6 ?? '',
-          key: proxy.key ?? '',
-          protocol: ProxyProtocol.HTTP
-        }
+      const proxies = await mktProxyDb.proxyRepo.find({
+        where: { id: In(payload) }
       })
-      .filter((item) => item !== undefined)
 
-    const data = await checkLiveOrDieProxy(dataCheck)
-    console.log('data', data)
-    const chunkSize = random(500, 700)
+      const dataCheck = proxies
+        .map((proxy): IPayloadCheckProxy | undefined => {
+          if (!proxy.host || !proxy.port) {
+            return
+          }
 
-    await Promise.all(
-      map(chunk(data, chunkSize), (chunk) =>
-        Promise.all(
-          chunk.map((item) =>
-            ProxyModel.updateProxyByField(
-              {
-                key: 'id',
-                select: [item.proxy.id],
-                value: { status: item.status ? ProxyStatus.LIVE : ProxyStatus.DIE }
-              },
-              mktProxyDb
+          return {
+            id: proxy.id,
+            host: proxy.host,
+            port: proxy.port,
+            username: proxy.username ?? '',
+            password: proxy.password ?? '',
+            ipV6: proxy.ipV6 ?? '',
+            key: proxy.key ?? ''
+          }
+        })
+        .filter((item) => item !== undefined)
+
+      const data = await checkLiveOrDieProxy(dataCheck)
+      const chunkSize = random(500, 700)
+
+      await Promise.all(
+        map(chunk(data, chunkSize), (chunk) =>
+          Promise.all(
+            chunk.map((item) =>
+              ProxyModel.updateProxyByField(
+                {
+                  key: 'id',
+                  select: [item.proxy.id],
+                  value: { status: item.status ? EnumProxyStatus.LIVE : EnumProxyStatus.DIE }
+                },
+                mktProxyDb
+              )
             )
           )
         )
       )
-    )
 
-    return createResponse('check_live_or_die_proxies_success', 'success', {
-      data
-    })
+      return createResponse('check_live_or_die_proxies_success', 'success', {
+        data
+      })
+    } catch (error) {
+      logger.error(`Check live or die proxy error: ${error}`)
+    }
+
+    return createResponse('check_live_or_die_proxy_failed', 'error')
   })
 
   ipcMainHandle('proxy_readAllHistoryProxy', async (_, payload) => {

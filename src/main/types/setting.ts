@@ -1,4 +1,4 @@
-import { ProviderNameType } from '@vitechgroup/mkt-proxy-client'
+import { EnumProxyProvider } from '@vitechgroup/mkt-proxy-client'
 import { ITaskTypes, IUser } from '.'
 
 export type AppSettings = {
@@ -96,7 +96,7 @@ export type ISettingSystem = {
 
 export type ISettingProxy = {
   ip_local: string
-  type_proxy: ProviderNameType | 'no_change_ip'
+  type_proxy: EnumProxyProvider | 'no_change_ip' | 'shared_key_pool'
   selected_proxy: 'proxy_rotating' | 'no_selected'
   tm_proxy: IKey
   proxy_v6: IKey

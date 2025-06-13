@@ -17,14 +17,8 @@ export const connectMktJobDb = async (): Promise<MktJobDb> => {
   return mktJobDb
 }
 export const connectMktProxyDb = async (): Promise<MktProxyDb> => {
-  const mktProxyFb = MktProxyManager.getInstance(DB_PROXY_FILE).mktProxyDb
-
-  if (!mktProxyFb.dataSource.isInitialized) {
-    await mktProxyFb.dataSource.initialize()
-    mktProxyFb.connect()
-  }
-
-  return mktProxyFb
+  const mktProxyFb = MktProxyManager.getInstance(DB_PROXY_FILE)
+  return await mktProxyFb.connectDb()
 }
 export const connectMktBrowserDb = async (): Promise<MktBrowserDb> => {
   const mktBrowserDb = MktBrowserDb.get(DB_PROFILE_FILE)
@@ -36,7 +30,6 @@ export const connectMktBrowserDb = async (): Promise<MktBrowserDb> => {
 
   return mktBrowserDb
 }
-
 export const updateSettingBy = <T>(
   by: keyof AppSettings,
   payload: Partial<T>,

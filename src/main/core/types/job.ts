@@ -7,7 +7,7 @@ import {
   ITypeModuleLogUpdate
 } from '@preload/types'
 import { ITypeLogUpdate, JobDetail, JobDetailStatus, MktJobQueue } from '@vitechgroup/mkt-job-queue'
-import { IPayloadProxyAssigned } from '@vitechgroup/mkt-proxy-client'
+import { EnumProxyProvider, IProxyAssigned, IProxyInfo } from '@vitechgroup/mkt-proxy-client'
 import { MessagePort } from 'node:worker_threads'
 
 export type IDataAction<K extends ITaskName> = {
@@ -32,7 +32,7 @@ export interface IDataRetry {
 
 export type ICallbackAction<K extends ITaskName> = (
   data: IDataAction<K>,
-  proxy?: IPayloadProxyAssigned
+  proxy?: IProxyAssigned
 ) => Promise<JobDetailStatus>
 
 export type IHandleParentMessage = (message: IResultMessageWorker<unknown>) => Promise<void>
@@ -41,4 +41,8 @@ export interface IPayloadJobManager<K extends ITaskName> extends IDefaultData {
   retry?: IDataRetry
   callbackAction: ICallbackAction<K>
   handleParentMessage: IHandleParentMessage
+}
+export interface IProxyData {
+  proxy: IProxyInfo | undefined
+  typeChangeIp: EnumProxyProvider | 'shared_key_pool'
 }

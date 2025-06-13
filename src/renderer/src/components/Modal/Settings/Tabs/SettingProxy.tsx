@@ -9,7 +9,6 @@ import { getValueSelected } from '@renderer/helper'
 import { useDraftLocalModalSetting } from '@renderer/hook'
 import { useReadSettingProxy, useUpdateSettingBy } from '@renderer/services'
 import { DefaultSettingProps } from '@renderer/types'
-import type { ProviderNameType } from '@vitechgroup/mkt-proxy-client'
 import { useFormik } from 'formik'
 import { useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -51,7 +50,7 @@ const SettingProxy = ({ formId, handleClosed }: DefaultSettingProps): JSX.Elemen
   const typeChangeIp = formik?.values?.type_proxy
 
   const valueCurrentOption = useMemo(() => {
-    const newTypeChangeIpOption = arrProxymart.includes(typeChangeIp as ProviderNameType)
+    const newTypeChangeIpOption = arrProxymart.includes(typeChangeIp)
       ? 'proxy_mart_reseller'
       : typeChangeIp
     return getValueSelected(newTypeChangeIpOption, dataOptionProxy)
@@ -173,7 +172,7 @@ const SettingProxy = ({ formId, handleClosed }: DefaultSettingProps): JSX.Elemen
             </div>
             <div className="col-span-4 w-1/2">
               <div>
-                {arrProxymart.includes(typeChangeIp as ProviderNameType) && (
+                {arrProxymart.includes(typeChangeIp) && (
                   <div className="flex gap-10 mb-2">
                     <RadioField
                       formik={formik}

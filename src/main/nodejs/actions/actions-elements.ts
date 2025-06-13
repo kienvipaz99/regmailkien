@@ -23,7 +23,6 @@ export const clickForSelector = async (
   }
   return true
 }
-
 export const tapForSelector = async (
   page: Page,
   options: {
@@ -108,16 +107,17 @@ export const typeTextToSelector = async (
 
 export const scrollWindow = async (page: Page, scrollValue: number): Promise<boolean> => {
   try {
-    const fn = `(scroll) =>
-      window.scroll({
-        top: window.scrollY + scroll,
-        behavior: 'smooth',
-      })`
-    await evaluateWithParams(page, fn, [scrollValue])
+    await evaluateWithParams(
+      page,
+      `(scroll) => {
+      window.scroll({ top: window.scrollY + scroll, behavior: 'smooth' })
+    }`,
+      [scrollValue]
+    )
+    return true
   } catch {
     return false
   }
-  return true
 }
 
 export const scrollSmooth = async (page: Page, distance: number): Promise<boolean> => {
@@ -179,28 +179,21 @@ export const scrollToElement = async (
   }
 ): Promise<boolean> => {
   const { selector, scrollTime, scrollValue, index } = options
-  const timeout = 1000
   try {
     for (let i = 0; i < scrollTime; i++) {
       await scrollWindow(page, scrollValue)
-      if (
-        (await waitElementExistScreen(page, {
-          selector,
-          timeout,
-          index
-        })) === 1
-      )
+      if ((await waitElementExistScreen(page, { selector, timeout: 1000, index })) === 1) {
         return true
-      await delay(1000)
+      }
     }
-    const fn = `(selectorTarget, indexElement) => {
-      const elements =
-        document.querySelectorAll(selectorTarget)[indexElement];
-      if (elements)
-        elements.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }`
-
-    await evaluateWithParams(page, fn, [selector, index])
+    await evaluateWithParams(
+      page,
+      `(sel, idx) => {
+      const el = document.querySelectorAll(sel)[idx];
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }`,
+      [selector, index]
+    )
     return true
   } catch {
     return false

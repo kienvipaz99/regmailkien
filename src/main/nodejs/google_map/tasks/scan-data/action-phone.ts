@@ -23,7 +23,6 @@ import {
 } from '@main/nodejs/actionphone/random-action'
 import { ICustomData, ITaskName } from '@main/types'
 import { delay } from '@vitechgroup/mkt-key-client'
-import { MktPhoneFarm } from '@vitechgroup/mkt-phone-farm'
 import { random } from 'lodash'
 import { closeApp, isOpenedApp, openApp } from '../../../actionphone/open-app'
 
@@ -40,11 +39,7 @@ export const RegGmailPhone = async (data: ICustomData<ITaskName>): Promise<boole
     if (!serinamephone) {
       return false
     }
-    await MktPhoneFarm.start({
-      timeCheckDevice: 20000000,
-      wifiSSID: 'ViTechGroup Dev',
-      wifiPassword: 'vitechgroup2023'
-    })
+
     await activeADBKeyboard(serinamephone)
     await openApp(serinamephone)
 
@@ -56,8 +51,6 @@ export const RegGmailPhone = async (data: ICustomData<ITaskName>): Promise<boole
       )
       while (true) {
         if (await detectNodeByXPath(serinamephone, '//node[@text="Thêm tài khoản khác"]', 3)) {
-          console.log('đẫ tìm thấy')
-
           await clickDetectNodeByXPath(serinamephone, '//node[@text="Thêm tài khoản khác"]', 3)
           break
         } else {
@@ -70,13 +63,11 @@ export const RegGmailPhone = async (data: ICustomData<ITaskName>): Promise<boole
       if (await detectNodeByXPath(serinamephone, '//node[@text="Nhập tên của bạn"]', 20)) {
         await clickByPoint(serinamephone, new Point(540, 731))
         // nhập họ
-        console.log('data', lastName)
         await inputText(serinamephone, lastName)
 
         await clickByPoint(serinamephone, new Point(540, 971))
         //nhap ten
         await inputText(serinamephone, firstName)
-        console.log('data', firstName)
 
         await clickDetectNodeByXPath(serinamephone, '//node[@class="android.widget.Button"]', 2)
         if (await detectNodeByXPath(serinamephone, '//node[@text="Thông tin cơ bản"]', 3)) {

@@ -49,9 +49,10 @@ AppDataSource.initialize()
         const mktJobQueue = new MktJobQueue(DB_JOB_FILE, data.threadRun, false).setJobId(data.jobId)
         await mktJobQueue.open()
         const mktProxyManager = MktProxyManager.getInstance(DB_PROXY_FILE)
-        await mktProxyManager.mktProxyDb.dataSource.initialize()
-        mktProxyManager.mktProxyDb.connect()
-        return new StartAction(data, mktJobQueue, parentPort).start()
+        await (
+          await mktProxyManager.connectDb()
+        ).dataSource
+        return await new StartAction(data, mktJobQueue, parentPort).start()
       }
     }
   })

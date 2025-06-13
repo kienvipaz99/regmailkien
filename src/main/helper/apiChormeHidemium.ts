@@ -9,8 +9,6 @@ const port = 2222
 export const CreateProfileChormeHidemium = async (
   configChorme: IConfigChorme
 ): Promise<IResponseCreateProfileChorme | null> => {
-  console.log(configChorme.proxy, 'configChorme.proxy')
-
   const payload = {
     os: 'win',
     win: ['10'],
@@ -21,19 +19,15 @@ export const CreateProfileChormeHidemium = async (
     audioContext: 'true',
     webGLMetadata: 'true',
     clientRectsEnable: 'false',
-    noiseFont: 'false', // true   false
-    command: '--lang=vi',
-    resolution: configChorme.resolution,
+    noiseFont: 'false',
+    resolution: '1920x1080',
     proxy: configChorme.proxy,
     name: configChorme.name,
     checkname: true,
     folder_name: '',
-    deviceMemory: 4, // If you want to randomize this value, please comment out this line.
-    hardwareConcurrency: 16,
-    cookies: [],
-    version: '136'
+    deviceMemory: 8,
+    version: '137'
   }
-
   return await axios
     .post(`http://127.0.0.1:${port}/create-profile-custom`, payload, {
       headers: {
@@ -70,7 +64,6 @@ http://127.0.0.1:${port}/openProfile`,
       }
     )
 
-    console.log('✅ Success:', response.data)
     return response.data as IResponseOpenChormeHidemium
   } catch (error) {
     console.error('❌ Error:', error)
@@ -113,18 +106,14 @@ export const checkChromeProfileStatus = async (uuid: string): Promise<boolean> =
 }
 export const deleteChromeProfile = async (uuid: string): Promise<boolean> => {
   try {
-    const response = await axios.delete(
-      `http://127.0.0.1:${port}/v1/browser/destroy?is_local=true`,
-      {
-        data: { uuid_browser: [uuid] },
-        headers: {
-          'Content-Type': 'application/json'
-        }
+    await axios.delete(`http://127.0.0.1:${port}/v1/browser/destroy?is_local=false`, {
+      data: { uuid_browser: [uuid] },
+      headers: {
+        'Content-Type': 'application/json'
       }
-    )
+    })
 
     // Kiểm tra nếu xoá thành công
-    console.log(`response`, response.data)
     return true
   } catch (error) {
     console.error(`❌ Lỗi khi xoá profile ${uuid}:`, error)
@@ -134,9 +123,9 @@ export const deleteChromeProfile = async (uuid: string): Promise<boolean> => {
 export const changeFingerprint = async (uuid: string): Promise<boolean> => {
   try {
     const response = await axios.put(
-      `http://127.0.0.1:${port}/v2/browser/change-fingerprint?is_local=true`,
+      `http://127.0.0.1:${port}/v2/browser/change-fingerprint?is_local=false`,
+      { profile_uuid: uuid },
       {
-        data: { profile_uuid: uuid },
         headers: {
           'Content-Type': 'application/json'
         }
@@ -144,10 +133,9 @@ export const changeFingerprint = async (uuid: string): Promise<boolean> => {
     )
     console.log('🚀 ~ changeFingerprint ~ response:', response.data)
 
-    // Kiểm tra nếu xoá thành công
     return true
   } catch (error) {
-    console.error(`❌ Lỗi khi xoá profile ${uuid}:`, error)
+    console.error(`❌ Lỗi khi thay đổi fingerprint cho profile ${uuid}:`, error)
     return false
   }
 }

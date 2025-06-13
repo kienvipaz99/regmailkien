@@ -1,28 +1,20 @@
 import { changeFingerprint, CreateProfileChormeHidemium, OpenChormeHidemium } from '@main/helper'
 import { ICustomData, ITaskName } from '@main/types'
 import { JobDetailStatus } from '@vitechgroup/mkt-job-queue'
-import { IPayloadProxyAssigned } from '@vitechgroup/mkt-proxy-client'
+import { IProxyAssigned } from '@vitechgroup/mkt-proxy-client'
 import axios from 'axios'
 import puppeteer from 'puppeteer-core'
 import { findNextAvailablePosition, getActualScreenResolution } from '../helper/rowchrome'
 import { RegGmailChormeHidemium } from './tasks'
-
 interface ICustomDataWithProxy extends ICustomData<ITaskName> {
-  proxy?: IPayloadProxyAssigned
+  proxy?: IProxyAssigned
 }
 
 export const executeAction = async (data: ICustomDataWithProxy): Promise<JobDetailStatus> => {
-  const { jobData, jobId } = data
+  const { jobData } = data
   const checkTypeRegister = jobData.config.creation_method
   let result: JobDetailStatus = JobDetailStatus.complete
   // const device: string | null = null
-
-  console.log('Starting job for account:', data.account.uid)
-  console.log('Current job data:', {
-    jobId: jobId,
-    actionName: jobData.actionName,
-    creation_method: checkTypeRegister
-  })
 
   switch (checkTypeRegister) {
     case 'browser': {
@@ -36,13 +28,17 @@ export const executeAction = async (data: ICustomDataWithProxy): Promise<JobDeta
           height: Math.floor(screenRes.height / row)
         }
         const { x, y } = findNextAvailablePosition(width, height, col, row)
-        console.log('Starting browser registration for account:', data.account.uid)
+        // const dataproxy = await ProxyHi()
+        // const passproxy=parseProxyString(da)
         const chormeProfile = await CreateProfileChormeHidemium({
           name: data.account.uid,
-          proxy: data.proxy ? `HTTP|${data.proxy?.host}|${data.proxy?.port}` : '',
+          proxy: data.proxy
+            ? data.proxy?.password
+              ? `HTTP|${data.proxy?.host}|${data.proxy?.port}|${data.proxy?.username}|${data.proxy?.password}`
+              : `HTTP|${data.proxy?.host}|${data.proxy?.port}`
+            : '',
           resolution: `${width}x${height}`
         })
-        console.log('Created chrome profile:', chormeProfile?.content?.uuid)
 
         if (!chormeProfile?.content?.uuid) {
           console.error('Failed to create chrome profile')
@@ -50,8 +46,6 @@ export const executeAction = async (data: ICustomDataWithProxy): Promise<JobDeta
         }
 
         await changeFingerprint(chormeProfile?.content?.uuid)
-        console.log('Changed fingerprint for profile:', chormeProfile?.content?.uuid)
-
         const startChorme = await OpenChormeHidemium(
           chormeProfile?.content?.uuid,
           x,
@@ -65,17 +59,16 @@ export const executeAction = async (data: ICustomDataWithProxy): Promise<JobDeta
           return JobDetailStatus.fail
         }
 
-        console.log('Started chrome with port:', startChorme?.data?.remote_port)
-
         const response = await axios.get(
           `http://127.0.0.1:${startChorme?.data?.remote_port}/json/version`
         )
         const wsUrl = response.data.webSocketDebuggerUrl
         const browser = await puppeteer.connect({ browserWSEndpoint: wsUrl })
+        const [page] = await browser.pages()
 
         const regResult = await RegGmailChormeHidemium({
           ...data,
-          browser: browser,
+          page: page,
           uuid: chormeProfile?.content?.uuid
         })
 

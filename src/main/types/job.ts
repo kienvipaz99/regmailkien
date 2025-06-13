@@ -9,7 +9,7 @@ import type {
 } from '@preload/types'
 import type { IPayloadLogUpdate, JobDetail } from '@vitechgroup/mkt-job-queue'
 import { MessagePort } from 'node:worker_threads'
-import { Browser } from 'puppeteer-core'
+import { Page } from 'puppeteer-core'
 import { ITaskName, ITaskTypes } from './task-action'
 
 export type ITypeLogUpdate = (options: IPayloadLogUpdate<ITypeModuleLogUpdate>) => Promise<boolean>
@@ -21,7 +21,7 @@ export interface ICustomData<K extends ITaskName> {
   jobData: IJobData<K>
   account: Account
   parentPort: MessagePort
-  browser?: Browser
+  page?: Page
   uuid?: string
   logUpdate: ITypeLogUpdate
   serinamephone?: string

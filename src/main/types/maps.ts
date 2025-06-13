@@ -1,9 +1,9 @@
-import { MktBrowser } from '@vitechgroup/mkt-browser'
+import { IBrowserProvider } from '@vitechgroup/mkt-browser'
 import { MktMaps } from '@vitechgroup/mkt-maps'
 
 export interface IModuleAction {
   mktMaps: MktMaps
-  mktBrowser: MktBrowser
+  mktBrowser: IBrowserProvider
   mktCaptcha?: object
   mktPhone?: object
 }

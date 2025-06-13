@@ -3,7 +3,7 @@ import { ResultType } from '@vitechgroup/mkt-browser'
 import { delay, sampleShuffle, splitTrim } from '@vitechgroup/mkt-key-client'
 import { map, sample } from 'lodash'
 import { ElementHandle, Page } from 'puppeteer-core'
-import { scrollToElementVisible } from '.'
+import { scrollToElementVisible } from './scrolling'
 
 const translateExpression = (text: string): string => {
   const upperCaseChars =

@@ -1,4 +1,5 @@
 import { delay } from '@vitechgroup/mkt-key-client'
+import { random } from 'lodash'
 import { ElementHandle, Page } from 'puppeteer-core'
 import { evaluateWithParams } from '.'
 
@@ -13,6 +14,85 @@ export const waitForSelector = async (
     return false
   }
   return true
+}
+export const awaittypeTextToSelector = async (
+  page: Page,
+  options: {
+    selector: string
+    index: number
+    text: string
+    timeout: number
+    shouldClearText: boolean
+    enter?: boolean
+  }
+): Promise<boolean> => {
+  const { selector, index, text, timeout, shouldClearText, enter = false } = options
+  const start = Date.now()
+  while (Date.now() - start < timeout) {
+    const elements = await getElementsBySelector(page, {
+      selector,
+      index,
+      timeout
+    })
+    if (elements) {
+      if (shouldClearText) {
+        await elements?.focus()
+        await page.keyboard.down('Control')
+        await page.keyboard.press('A')
+        await page.keyboard.up('Control')
+        await page.keyboard.press('Backspace')
+      }
+      await elements?.hover()
+      await elements?.click({ clickCount: 3 }) // chọn hết văn bản
+      await delay(300)
+
+      if (shouldClearText) {
+        await page.keyboard.press('Backspace') // sau khi click chọn hết
+      }
+
+      await elements?.type(text, { delay: random(50, 100) })
+      enter && (await page.keyboard.press('Enter'))
+      await delay(2000)
+
+      return true
+    }
+  }
+  return false
+}
+export const awaitclickForSelector = async (
+  page: Page,
+  options: {
+    selector: string
+    index: number
+    timeout: number
+  }
+): Promise<boolean> => {
+  const { selector, index, timeout } = options
+  const start = Date.now()
+
+  while (Date.now() - start < timeout) {
+    try {
+      const elements = await getElementsBySelector(page, {
+        selector,
+        index,
+        timeout: 500 // timeout ngắn cho mỗi lần thử
+      })
+
+      if (elements) {
+        const isVisible = await elements.boundingBox() // kiểm tra xem có trong viewport không
+        if (isVisible) {
+          await elements.click({ delay: 100 }) // thêm delay để mô phỏng người dùng thật
+          return true
+        }
+      }
+    } catch (err) {
+      // có thể là lỗi detached hoặc không clickable
+    }
+
+    await delay(1000) // chờ 1 giây trước khi thử lại
+  }
+
+  return false // hết timeout
 }
 
 export const elementWaitForSelector = async (
@@ -49,6 +129,53 @@ export const waitLostForSelector = async (
     await delay(1000)
   }
   return false
+}
+export const clickGmailInNewTab = async (page: Page): Promise<boolean> => {
+  try {
+    const waitAndGetShadowRoot = async (
+      handle: ElementHandle
+    ): Promise<ElementHandle<Node> | null> => {
+      const shadowRoot = await handle.evaluateHandle((el) => el.shadowRoot)
+      return shadowRoot.asElement()
+    }
+
+    console.log('🔍 Tìm <ntp-app>...')
+    const ntpApp = await page.waitForSelector('ntp-app', { timeout: 5000 })
+    if (!ntpApp) throw new Error('❌ Không tìm thấy <ntp-app>')
+
+    const shadow1 = await waitAndGetShadowRoot(ntpApp)
+    if (!shadow1) throw new Error('❌ Không mở được shadowRoot từ <ntp-app>')
+
+    const content = await shadow1.$('#content')
+    if (!content) throw new Error('❌ Không tìm thấy #content trong shadow1')
+
+    const ntpIframe = await content.$('ntp-iframe#oneGoogleBar')
+    if (!ntpIframe) throw new Error('❌ Không tìm thấy <ntp-iframe#oneGoogleBar>')
+
+    const shadow2 = await waitAndGetShadowRoot(ntpIframe)
+    if (!shadow2) throw new Error('❌ Không mở được shadowRoot từ ntp-iframe')
+
+    const iframeElement = await shadow2.$('iframe#iframe')
+    if (!iframeElement) throw new Error('❌ Không tìm thấy iframe#iframe')
+
+    const iframeContent = await iframeElement.contentFrame()
+    if (!iframeContent)
+      throw new Error('❌ Không thể truy cập nội dung iframe (likely cross-origin)')
+
+    console.log('🔍 Tìm nút Gmail...')
+    const gmailLink = await iframeContent.$('a[aria-label*="Gmail"]')
+    if (!gmailLink) {
+      console.warn('❌ Không tìm thấy nút Gmail trong iframe')
+      return false
+    }
+
+    await gmailLink.click()
+    console.log('✅ Đã click Gmail thành công')
+    return true
+  } catch (err) {
+    console.error('🚨 Lỗi khi click Gmail trong new tab:', err)
+    return false
+  }
 }
 
 export const elementWaitLostForSelector = async (

@@ -1,5 +1,5 @@
 import { DefaultSettingProps } from '@renderer/types'
-import type { ProviderNameType } from '@vitechgroup/mkt-proxy-client'
+import type { EnumProxyProvider, ProxyProviderFacade } from '@vitechgroup/mkt-proxy-client'
 import { TFunction } from 'i18next'
 import { IconType } from 'react-icons'
 import { GiSettingsKnobs } from 'react-icons/gi'
@@ -35,7 +35,7 @@ export interface IListViewProxyItem {
 }
 
 export type FilteredProviderNameType = Exclude<
-  ProviderNameType,
+  EnumProxyProvider,
   'ip2_world_proxy' | 'luna_proxy' | 'net_proxy' | 's5_proxy' | 'zing_proxy'
 >
 
@@ -117,7 +117,7 @@ export const ListViewProxy: any = {
   }
 }
 
-export const arrProxymart: Array<ProviderNameType | 'no_change_ip' | 'proxy_static'> = [
+export const arrProxymart: Array<ProxyProviderFacade | 'no_change_ip' | 'proxy_static'> = [
   'proxy_mart_key',
   'proxy_mart_reseller'
 ]

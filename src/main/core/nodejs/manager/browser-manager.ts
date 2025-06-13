@@ -1,19 +1,18 @@
 import { checkCloseQueue, logger, sendMessageToMain } from '@main/core/nodejs'
 import { ITaskName } from '@main/types'
 import { IDataBrowserManager } from '@preload/types'
-import { IMktBrowserOption, MktBrowser } from '@vitechgroup/mkt-browser'
-import { DB_PROFILE_FILE } from '../_const'
+import { BrowserConfig, BrowserProviderFacade, IBrowserProvider } from '@vitechgroup/mkt-browser'
 import { BrowserStatus } from '../enum'
 
 class BrowserSession {
   public uid: string
-  public browser: MktBrowser
-  public startPromise: Promise<MktBrowser | undefined> | null
+  public browser: IBrowserProvider
+  public startPromise: Promise<IBrowserProvider | undefined> | null
 
   public status: BrowserStatus
   public lastUsed: number
 
-  constructor(uid: string, browser: MktBrowser) {
+  constructor(uid: string, browser: IBrowserProvider) {
     this.uid = uid
     this.browser = browser
 
@@ -21,39 +20,13 @@ class BrowserSession {
     this.lastUsed = Date.now()
   }
 
-  public async start(): Promise<boolean> {
-    this.status = BrowserStatus.STARTING
-
-    try {
-      this.startPromise = this.browser.start()
-      await this.startPromise
-      this.status = BrowserStatus.RUNNING
-      this.startPromise = null
-      return true
-    } catch (error) {
-      this.status = BrowserStatus.IDLE
-      this.startPromise = null
-      logger.error(`[Lỗi khởi tạo trình duyệt]: [UID_ACCOUNT = ${this.uid}], ${error}`)
-      await this.close()
-      return false
-    }
-  }
-
   public async close(): Promise<boolean> {
     try {
-      if (this.startPromise) {
-        await this.startPromise
-      }
-      const result = await this.browser.close()
-      if (result) {
-        this.status = BrowserStatus.CLOSED
-      }
-      return result
+      await this.browser.close()
+      return true
     } catch (error) {
       logger.error(`[Lỗi đóng trình duyệt]: ${error}`)
       return false
-    } finally {
-      this.startPromise = null
     }
   }
 }
@@ -70,50 +43,26 @@ export class BrowserManager {
     this.payload.parentPort.on('check_queue', this.handleCheckQueue.bind(this))
   }
 
-  public createBrowser(
-    uid: string,
-    options: Pick<
-      IMktBrowserOption,
-      'realIp' | 'version' | 'baseProfilePath' | 'baseBrowserPath' | 'screenSize' | 'sort' | 'scale'
-    > & { startUrl: string; socialPlatform: string; hide: boolean }
-  ): void {
-    const session = this.sessionMap.get(uid)
-    if (session) {
-      session.lastUsed = Date.now()
-      return
-    }
-
-    const mktBrowser: MktBrowser = new MktBrowser({
-      ...options,
-      os: 'win',
-      language: 'vi',
-      profileId: uid.trim(),
-      profileName: uid.trim(),
-      profileDb: DB_PROFILE_FILE
-    })
-
-    this.sessionMap.set(uid, new BrowserSession(uid, mktBrowser))
-  }
-
   public async startBrowser(
     uid: string,
+    options: BrowserConfig,
     noOpenNewTab: boolean = false,
     noBlockRequests: boolean = false
-  ): Promise<MktBrowser | undefined> {
-    const session = this.sessionMap.get(uid)
-    if (!session) {
-      return
-    }
-
-    if ([BrowserStatus.IDLE, BrowserStatus.CLOSED].includes(session.status)) {
-      const result = await session.start()
+  ): Promise<IBrowserProvider | undefined> {
+    try {
+      const result = await BrowserProviderFacade.getProvider(options)
       if (!result) {
         return
       }
-      this.registerBrowserEvents(uid, session.browser, noOpenNewTab, noBlockRequests)
-    }
 
-    return session.browser
+      this.sessionMap.set(uid, new BrowserSession(uid, result))
+
+      this.registerBrowserEvents(uid, result, noOpenNewTab, noBlockRequests)
+      return result
+    } catch (error) {
+      logger.error(`[Lỗi khởi tạo trình duyệt]: ${error}`)
+      return undefined
+    }
   }
 
   public async closeBrowser(uid: string): Promise<boolean> {
@@ -121,8 +70,6 @@ export class BrowserManager {
     if (!session) {
       return false
     }
-
-    console.log('pid', session.browser.chromeProcess)
 
     const result = await session.close()
     if (result) {
@@ -146,17 +93,18 @@ export class BrowserManager {
 
   private registerBrowserEvents(
     uid: string,
-    browser: MktBrowser,
+    browser: IBrowserProvider,
     noOpenNewTab: boolean,
     noBlockRequests: boolean
   ): void {
-    browser.browser.on('disconnected', () => this.sessionMap.delete(uid))
+    browser.getBrowser().on('disconnected', () => this.sessionMap.delete(uid))
 
     if (!noBlockRequests) {
-      browser.action.pagePup
+      browser
+        .getPage()
         .setRequestInterception(true)
         .then(() => {
-          browser.action.pagePup.on('request', (req) => {
+          browser.getPage().on('request', (req) => {
             if (['stylesheet', 'font', 'image'].includes(req.resourceType())) {
               req.abort()
             } else {
@@ -170,7 +118,7 @@ export class BrowserManager {
     }
 
     if (noOpenNewTab) {
-      browser.browser.on('targetcreated', (target) =>
+      browser.getBrowser().on('targetcreated', (target) =>
         target
           .page()
           .then((newPage) => {

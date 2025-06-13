@@ -6,8 +6,7 @@ import {
   IObjectParams,
   IPayloadRemoveProxy
 } from '@preload/types'
-import { lookupIp } from '@vitechgroup/mkt-browser'
-import { MktProxyDb, Proxy, ProxyStatus } from '@vitechgroup/mkt-proxy-client'
+import { checkInfoIp, EnumProxyStatus, MktProxyDb, Proxy } from '@vitechgroup/mkt-proxy-client'
 import { forEach, map, random } from 'lodash'
 import { In } from 'typeorm'
 
@@ -18,10 +17,14 @@ export const ProxyModel = {
 
       await Promise.all(
         map(payload, async (ip) => {
-          const infoIp = ip.host ? await lookupIp(ip.host) : null
-
+          const infoIp = ip.host ? await checkInfoIp(ip.host) : null
           await mktProxyDb.proxyRepo
-            .save({ ...ip, ...infoIp })
+            .save({
+              ...ip,
+              country: infoIp?.geoip1?.country,
+              lat: infoIp?.geoip1?.lat,
+              lon: infoIp?.geoip1?.lon
+            } as Proxy)
             .then(() => true)
             .catch(() => false)
         }).filter((item) => item !== undefined)
@@ -44,7 +47,7 @@ export const ProxyModel = {
       const skip = (page - 1) * pageSize
 
       const filterLive = {
-        status: filterType === 'live' ? ProxyStatus.LIVE : ProxyStatus.DIE,
+        status: filterType === 'live' ? EnumProxyStatus.LIVE : EnumProxyStatus.DIE,
         ...(proxyType ? { proxyType: In(proxyType) } : {})
       }
 

@@ -1,4 +1,4 @@
-import { ITypeProxy, ProviderNameType } from '@vitechgroup/mkt-proxy-client'
+import { EnumProxyProvider, ITypeProxy } from '@vitechgroup/mkt-proxy-client'
 import { IOptionSelectFormat } from '../types'
 
 export const dataOptionProxy = [
@@ -8,18 +8,12 @@ export const dataOptionProxy = [
   { value: 'kiot_proxy', label: 'Kiotproxy' }
 ]
 
-export const configOptionConfigProxy: IOptionSelectFormat<ProviderNameType>[] = [
-  { value: 'tm_proxy', label: 'TMPROXY' },
-  { value: 'kiot_proxy', label: 'Kiotproxy' },
-  { value: 'ww_proxy', label: 'WWProxy' },
-  { value: 'proxy_mart_key', label: 'Proxy Mart' },
-  // { value: 'proxy_mart_reseller', label: 'Proxy Mart' },
-  // { value: 'net_proxy', label: 'NetProxy.io' },
-  // { value: 'zing_proxy', label: 'ZingProxy' },
-  { value: 'proxy_v6', label: 'Proxy v6' }
-  // { value: 'luna_proxy', label: 'Lunaproxy' },
-  // { value: 'ip2_world_proxy', label: 'IP2Word' },
-  // { value: 's5_proxy', label: 'S5Proxy' }
+export const configOptionConfigProxy: IOptionSelectFormat<string>[] = [
+  { value: EnumProxyProvider.TM_PROXY, label: 'TMPROXY' },
+  { value: EnumProxyProvider.KIOT_PROXY, label: 'Kiotproxy' },
+  { value: EnumProxyProvider.WWPROXY, label: 'WWProxy' },
+  { value: EnumProxyProvider.PROXY_MART_KEY, label: 'Proxy Mart' },
+  { value: 'shared_key_pool', label: '2 Proxy' }
 ]
 
 export const configOptionProtocolProxy: IOptionSelectFormat<ITypeProxy>[] = [

@@ -2,7 +2,7 @@ import { logger, sendMessageToMain } from '@main/core/nodejs'
 import { BrowserManager, JobManager } from '@main/core/nodejs/manager'
 import { IDataAction, IJobWorkerData, IResultMessageWorker, ITaskName } from '@preload/types'
 import { JobDetailStatus, MktJobQueue } from '@vitechgroup/mkt-job-queue'
-import { IPayloadProxyAssigned } from '@vitechgroup/mkt-proxy-client'
+import { IProxyAssigned } from '@vitechgroup/mkt-proxy-client'
 import { MessagePort } from 'node:worker_threads'
 import { executeAction } from '../google_map'
 
@@ -19,25 +19,26 @@ export class StartAction {
     this.parentPort = parentPort
   }
 
-  public start(): void {
+  public async start(): Promise<void> {
     this.browserManager = new BrowserManager({
       parentPort: this.parentPort,
       mktJobQueue: this.mktJobQueue
     })
 
-    new JobManager({
+    const jobManager = await JobManager.create({
       retry: this.data.retry,
       jobId: this.data.jobId,
       parentPort: this.parentPort,
       mktJobQueue: this.mktJobQueue,
       callbackAction: this.callbackAction.bind(this),
       handleParentMessage: this.handleParentMessage.bind(this)
-    }).start()
-  }
+    })
 
+    jobManager.start()
+  }
   private async callbackAction(
     dataAction: IDataAction<ITaskName>,
-    proxy?: IPayloadProxyAssigned
+    proxy?: IProxyAssigned
   ): Promise<JobDetailStatus> {
     console.log('🚀 ~ StartAction ~ callbackAction ~ proxy:', proxy)
 

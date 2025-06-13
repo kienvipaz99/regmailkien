@@ -31,8 +31,6 @@ export const createJob = async (
     const jobData: IJobData<ITaskName> = { ...result, config, actionName }
     const job = await mktJobDb.jobRepo.save({ data: JSON.stringify(jobData) })
 
-    console.log('Number of accounts to create:', listUniqueData.length)
-
     const jobDetailData = listUniqueData.map((uniqueData, index) => ({
       job,
       data: JSON.stringify({
@@ -46,7 +44,6 @@ export const createJob = async (
     }))
 
     await mktJobDb.jobDetailRepo.save(jobDetailData)
-    console.log('Number of job details created:', jobDetailData.length)
 
     return { jobId: job.id, threadRun: result.setting_system.threads_run }
   } catch (error) {

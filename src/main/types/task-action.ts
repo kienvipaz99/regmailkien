@@ -210,3 +210,9 @@ export interface IFormScanMap {
   last_name_path: string
   number_of_accounts: number
 }
+export interface TypeProxyHi {
+  status: number
+  message: string
+  proxyhttp: string
+  proxysocks5: string
+}

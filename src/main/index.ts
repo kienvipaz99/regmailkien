@@ -4,12 +4,7 @@ import { ISDEV } from '@vitechgroup/mkt-key-client'
 import { app, BrowserWindow, ipcMain, shell } from 'electron'
 import { join } from 'path'
 import icon from '../../resources/icon.png?asset'
-import {
-  preAppCheck,
-  registerSocketEvents,
-  reloadSetting,
-  sendMessageRenderer
-} from './core/electron'
+import { preAppCheck, reloadSetting, sendMessageRenderer } from './core/electron'
 import { APP_NAME, APPLE_ID, logger, MASP } from './core/nodejs'
 import { initDatabase, registerIPC } from './helper'
 
@@ -20,7 +15,7 @@ if (!gotTheLock) {
   let mainWindow: BrowserWindow
   let splashWindow: BrowserWindow | null
 
-  registerSocketEvents()
+  // registerSocketEvents()
   // checkMktClientAndAuth()
 
   app.on('second-instance', () => {

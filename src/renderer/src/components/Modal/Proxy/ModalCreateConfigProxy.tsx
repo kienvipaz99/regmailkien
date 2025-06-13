@@ -99,7 +99,7 @@ const ModalCreateConfigProxy = ({
                 name="provider"
                 options={configOptionConfigProxy?.map((option) => ({
                   ...option,
-                  isDisabled: typeProxyExits?.includes(option?.value)
+                  isDisabled: typeProxyExits?.includes(option.value)
                 }))}
                 classWapper="flex flex-col w-full"
               />
@@ -142,6 +142,9 @@ const ModalCreateConfigProxy = ({
                       : []),
                     ...(listV6.includes(formik?.values?.provider)
                       ? [{ value: 'v6_rotate', label: 'Proxy v6' }]
+                      : []),
+                    ...(formik?.values?.provider === 'shared_key_pool'
+                      ? [{ value: 'v4_rotate', label: 'Proxy v4' }]
                       : [])
                   ]}
                   classWapper="flex flex-col w-full"
